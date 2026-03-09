@@ -16,7 +16,7 @@ from app.prep.prompts import (
 
 logger = logging.getLogger(__name__)
 
-_MODEL = "claude-opus-4-6"
+_MODEL = "claude-sonnet-4-6"
 _MAX_TOKENS = 4096
 
 _PROMPT_BUILDERS = {
@@ -30,6 +30,7 @@ _PROMPT_BUILDERS = {
 # Cost per million tokens (input / output)
 _COST_TABLE = {
     "claude-opus-4-6": (15.0, 75.0),
+    "claude-sonnet-4-6": (3.0, 15.0),
 }
 
 

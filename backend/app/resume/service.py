@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 _HAIKU = "claude-haiku-4-5-20251001"
 _OPUS = "claude-opus-4-6"
+_SONNET = "claude-sonnet-4-6"
 
 
 async def _get_client() -> anthropic.AsyncAnthropic:
@@ -253,7 +254,7 @@ async def generate_personalized_prep(
 
     client = await _get_client()
     message = await client.messages.create(
-        model=_OPUS,
+        model=_SONNET,
         max_tokens=4096,
         system=personalized_system,
         messages=[{"role": "user", "content": personalized_user}],
@@ -265,7 +266,7 @@ async def generate_personalized_prep(
         "job_id": job_id,
         "content_type": content_type,
         "content": content,
-        "model": _OPUS,
+        "model": _SONNET,
         "cached": False,
         "personalized": True,
     }
