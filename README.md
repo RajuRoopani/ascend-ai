@@ -9,7 +9,8 @@
 
 <p align="center">
   <strong>Land top-of-band at FAANG+ and AI unicorns.</strong><br/>
-  Upload your resume → AI-match to best-fit roles → Get a deeply personalized end-to-end interview prep plan — powered by Claude Opus.
+  Upload your resume → AI-match to best-fit roles → Get a deeply personalized end-to-end interview prep plan — powered by Claude Opus.<br/>
+  Research any company's interview loop — even ones not in the tracked 31.
 </p>
 
 ---
@@ -27,6 +28,9 @@
 
 ### Career Match — Resume intelligence powered by Claude
 ![Ascend Career Match](docs/ascend-match.png)
+
+### Company Research — Interview intel for any company, not just the 31 tracked
+![Ascend Research](docs/ascend-research.png)
 
 ---
 
@@ -78,7 +82,26 @@ Every job listing unlocks 5 AI-generated, Claude Opus-powered prep plans:
 
 Plans are cached in PostgreSQL after first generation — instant on repeat access.
 
-### 4. Persistent Profile & Progress Tracking
+### 4. Company Research — Any Company, Not Just the 31
+The job board tracks 31 elite companies. But what if your target is Cloud Kitchens, Palantir, Stripe, or any company not in that list?
+
+The **Research tab** accepts any company name and generates a full interview intelligence brief via Claude Sonnet in ~30-60 seconds. Results are cached so repeat searches are instant.
+
+Each research report covers:
+| Section | Details |
+|---------|---------|
+| **Interview Loop** | Number of rounds, round types, who you meet, timeline |
+| **DSA Patterns** | Top algorithms this company tests with example problems |
+| **System Design** | Key topics, difficulty level, example questions |
+| **Tech Stack** | Languages, frameworks, infra stack the team actually uses |
+| **Culture** | Engineering culture, values, what "good" looks like |
+| **Compensation** | TC ranges by level (base + equity + bonus) |
+| **Pro Tips** | 7 insider tips sourced from public interview reports |
+| **Resources** | Glassdoor, Blind, Levels.fyi, engineering blog links |
+
+20 suggestion chips include Cloud Kitchens, Stripe, Databricks, Palantir, Plaid, Figma, Notion, Airtable, and more — but any company name works.
+
+### 5. Persistent Profile & Progress Tracking
 Every session is persisted and fully restorable:
 
 - **Unique profile** created on resume analysis, stored in PostgreSQL
@@ -98,6 +121,11 @@ Built on a **"terminal meets luxury"** dark design system. Every pixel communica
 ---
 
 ## The UI
+
+### Navigation
+```
+[Jobs]  [Companies]  [Research]  [✦ Career Match]        ● Live
+```
 
 ### Job Board — Live Roles from 31 Elite Companies
 ```
@@ -144,6 +172,31 @@ Built on a **"terminal meets luxury"** dark design system. Every pixel communica
 │  ║ Skills cloud  ║  │ ⬤ 91  OpenAI — L5 Staff        │   │
 │  ╚═══════════════╝  │ ⬤ 87  Cursor — Senior SWE      │   │
 │                     └─────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Research — Interview Intel for Any Company
+```
+┌─────────────────────────────────────────────────────────────┐
+│  🔍 Company Research · AI-powered interview intelligence    │
+│                                                             │
+│  Company name   [Cloud Kitchens            ]               │
+│  Role focus     [Software Engineer (optional)]             │
+│                                       [Research ↗]        │
+│                                                             │
+│  Popular:  [Stripe] [Databricks] [Palantir] [Figma]        │
+│            [Plaid]  [Notion]     [Airtable] [Rippling]     │
+│            [Cloud Kitchens] [Duolingo] ...                  │
+│                                                             │
+│  ──────────────────────────────────────────────────────    │
+│  Cloud Kitchens (City Storage Systems)                     │
+│                                                             │
+│  ## Interview Loop                                         │
+│  4 rounds · Phone screen → 2× technical → culture fit     │
+│                                                             │
+│  ## DSA Patterns                                           │
+│  Graphs, dynamic programming, system design at scale...    │
+│  ...                                                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -294,6 +347,8 @@ DELETE /api/profiles/{id}/apply/{job_id}                # Remove applied status
 POST   /api/profiles/{id}/progress/{job_id}/{type}      # Record prep tab viewed
 GET    /api/companies                                   # All companies grouped by tier
 GET    /api/companies/{slug}                            # Company profile + open roles
+POST   /api/companies/{slug}/match                      # Match company jobs to uploaded resume profile
+POST   /api/research/company                            # AI research brief for any company (cached)
 POST   /api/refresh                                     # Trigger manual job refresh
 GET    /health                                          # Health check
 ```
@@ -333,6 +388,7 @@ ascend-ai/
 │   │   ├── prep/          # Claude Opus prep generation + caching
 │   │   ├── resume/        # PDF parsing + AI resume analysis + job matching
 │   │   ├── profiles/      # Session tracking: applied jobs + prep progress
+│   │   ├── research/      # AI company research for any company (cached)
 │   │   ├── fetchers/      # Greenhouse, Lever, Ashby ATS fetchers
 │   │   └── scheduler.py   # 6-hour background refresh
 │   └── migrations/schema.sql
@@ -342,7 +398,8 @@ ascend-ai/
         │   ├── page.tsx              # Live job board
         │   ├── match/page.tsx        # Career Match (resume upload + AI matching)
         │   ├── jobs/[id]/page.tsx    # Job detail + AI prep accordion
-        │   └── companies/            # Company directory + profiles
+        │   ├── companies/            # Company directory + profiles
+        │   └── research/page.tsx     # Company Research (any company, AI-generated intel)
         └── components/
             ├── ui/CompanyLogo.tsx    # Smart logo with gradient-initials fallback
             ├── jobs/                 # JobCard, JobGrid, JobFilters, LevelBadge
