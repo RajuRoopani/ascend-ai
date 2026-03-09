@@ -28,7 +28,7 @@ export function Navbar() {
             </div>
             <div className="flex items-baseline gap-1.5">
               <span className="font-bold text-[var(--text-1)] tracking-tight text-sm">Ascend</span>
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[var(--accent)]/15 text-[var(--accent-light)]" style={{ fontFamily: "var(--font-mono)" }}>AI</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--accent)]/15 text-[var(--accent-light)] tracking-wide">AI</span>
             </div>
           </Link>
 
@@ -68,7 +68,7 @@ export function Navbar() {
 
             <div className="flex items-center gap-1.5 ml-2 px-3 py-1.5 rounded-lg border border-[var(--border)]">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] live-dot" />
-              <span className="text-[11px] font-medium text-[var(--text-3)]" style={{ fontFamily: "var(--font-mono)" }}>Live</span>
+              <span className="text-[11px] font-semibold text-[var(--text-3)]">Live</span>
             </div>
           </nav>
         </div>

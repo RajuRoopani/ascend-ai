@@ -9,8 +9,8 @@ import { JobFiltersPanel } from "@/components/jobs/JobFilters";
 function StatPill({ value, label }: { value: string | number; label: string }) {
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/8 backdrop-blur-sm">
-      <span className="text-[var(--text-1)] font-bold text-sm font-mono">{value}</span>
-      <span className="text-[var(--text-3)] text-[11px]">{label}</span>
+      <span className="text-[var(--text-1)] font-bold text-sm tracking-tight">{value}</span>
+      <span className="text-[var(--text-3)] text-[11px] font-medium">{label}</span>
     </div>
   );
 }

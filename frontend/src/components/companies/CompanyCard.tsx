@@ -19,10 +19,10 @@ export function CompanyCard({ company }: { company: Company }) {
           />
         </div>
         <div>
-          <p className="font-semibold text-[var(--text-1)] text-sm group-hover:text-[var(--accent-light)] transition-colors">
+          <p className="font-bold text-[var(--text-1)] text-sm tracking-tight group-hover:text-[var(--accent-light)] transition-colors">
             {company.name}
           </p>
-          <p className="text-xs text-[var(--text-3)] font-mono">{company.hq}</p>
+          <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">{company.hq}</p>
         </div>
       </div>
       <p className="text-xs text-[var(--text-3)] line-clamp-2 mb-3">{company.about}</p>
