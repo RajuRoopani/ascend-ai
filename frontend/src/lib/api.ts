@@ -1,6 +1,8 @@
 import type { PaginatedJobs, JobDetail, CompaniesResponse, CompanyDetail, PrepPlan, ContentType } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Always use relative paths — Next.js rewrites proxy /api/* to the backend.
+// This works identically locally and via devtunnel.
+const API_BASE = "";
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
