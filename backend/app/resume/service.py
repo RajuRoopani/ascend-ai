@@ -147,6 +147,90 @@ Respond with ONLY the JSON array."""
     return sorted(result, key=lambda x: x.get("match_score", 0), reverse=True)
 
 
+async def match_all_jobs(profile: dict, jobs: list[dict]) -> list[dict]:
+    """Score and rank ALL jobs against the candidate profile (used for company-specific matching)."""
+    if not jobs:
+        return []
+
+    client = await _get_client()
+
+    job_lines = "\n".join([
+        f"ID:{j['id']}|{j['level']}|{j['title']}|{j['company_name']}|{'Remote' if j.get('remote') else j.get('location', '') or 'Onsite'}"
+        for j in jobs
+    ])
+
+    skills_str = ", ".join(profile.get("skills", []))
+    level = profile.get("level", "L5")
+    exp = profile.get("years_experience", 0)
+    strengths = ", ".join(profile.get("strengths", []))
+    prev_companies = ", ".join(profile.get("previous_companies", []))
+    specializations = ", ".join(profile.get("specializations", []))
+
+    n = len(jobs)
+    top_n = min(n, 30)  # cap at 30 to keep response within token budget
+    message = await client.messages.create(
+        model=_HAIKU,
+        max_tokens=8192,
+        messages=[{
+            "role": "user",
+            "content": f"""You are a senior engineering recruiter. Rank the TOP {top_n} most suitable jobs for this candidate.
+
+CANDIDATE:
+- Level: {level} ({exp} years experience)
+- Current role: {profile.get("current_role", "")}
+- Skills: {skills_str}
+- Specializations: {specializations}
+- Previous companies: {prev_companies}
+- Strengths: {strengths}
+
+JOBS (ID|Level|Title|Company|Location):
+{job_lines}
+
+Return ONLY a JSON array (no markdown) of the top {top_n} best matches ranked by score:
+[{{"job_id":<number>,"match_score":<0-100>,"match_reasons":["reason1","reason2"],"skill_gaps":["gap1"]}},...]
+
+Scoring criteria:
+- Skills overlap with job requirements (40%)
+- Level alignment (30%)
+- Role/domain relevance (20%)
+- Growth opportunity (10%)
+Respond with ONLY the JSON array. Do not truncate — output all {top_n} entries."""
+        }]
+    )
+
+    try:
+        text = message.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"):
+                text = text[4:]
+        ranked = json.loads(text)
+    except Exception as e:
+        logger.warning("Failed to parse company match JSON: %s", e)
+        ranked = [{"job_id": j["id"], "match_score": 50, "match_reasons": ["General fit"], "skill_gaps": []} for j in jobs[:top_n]]
+
+    job_map = {j["id"]: j for j in jobs}
+    result = []
+    for r in ranked[:top_n]:
+        jid = r.get("job_id")
+        if jid and jid in job_map:
+            job = job_map[jid]
+            result.append({
+                **r,
+                "title": job["title"],
+                "company_name": job["company_name"],
+                "company_slug": job["company_slug"],
+                "company_logo_url": job["company_logo_url"],
+                "company_tier": job["company_tier"],
+                "level": job["level"],
+                "remote": job["remote"],
+                "url": job["url"],
+                "location": job.get("location", ""),
+            })
+
+    return sorted(result, key=lambda x: x.get("match_score", 0), reverse=True)
+
+
 async def analyze_resume(resume_text: str) -> dict:
     """Full pipeline: parse resume + fetch jobs + rank matches + persist result."""
     profile = await parse_resume(resume_text)

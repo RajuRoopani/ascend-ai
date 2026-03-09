@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getCompany } from "@/lib/api";
 import { CompanyLogo } from "@/components/ui/CompanyLogo";
-import { LevelBadge } from "@/components/jobs/LevelBadge";
-import { RemotePill } from "@/components/jobs/RemotePill";
+import { CompanyMatchedJobs } from "@/components/companies/CompanyMatchedJobs";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -101,48 +100,7 @@ export default async function CompanyPage({ params }: Props) {
           )}
         </div>
 
-        {/* Open roles */}
-        <div className="card p-6">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-widest flex items-center gap-2 font-mono">
-              <span>💼</span> Open SWE Roles ({company.open_roles})
-            </h2>
-            {company.open_roles > 0 && (
-              <Link href={`/?company=${company.id}`} className="text-xs text-[var(--accent-light)] hover:text-[var(--text-1)] font-medium transition-colors">
-                View all →
-              </Link>
-            )}
-          </div>
-
-          {company.jobs.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-[var(--text-3)] text-sm">No open SWE roles right now</p>
-              <p className="text-[var(--text-3)] text-xs mt-1 font-mono">Jobs refresh every 6 hours</p>
-            </div>
-          ) : (
-            <div className="space-y-1.5">
-              {company.jobs.map((job) => (
-                <div key={job.id} className="flex items-center gap-3 p-3.5 rounded-xl hover:bg-[var(--elevated)] transition-colors group">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <LevelBadge level={job.level} />
-                    <span className="text-sm font-medium text-[var(--text-1)] truncate group-hover:text-[var(--accent-light)] transition-colors">
-                      {job.title}
-                    </span>
-                    <RemotePill remote={job.remote} />
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <Link href={`/jobs/${job.id}`} className="btn-primary text-xs py-1.5 px-3">
-                      Prep ✨
-                    </Link>
-                    <a href={job.url} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs py-1.5 px-3">
-                      Apply
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <CompanyMatchedJobs slug={slug} staticJobs={company.jobs} />
       </div>
     </>
   );

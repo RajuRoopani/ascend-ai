@@ -54,6 +54,14 @@ export function getCompany(slug: string): Promise<CompanyDetail> {
   return apiFetch<CompanyDetail>(`/api/companies/${slug}`);
 }
 
+export function matchCompanyJobs(slug: string, analysisId: number): Promise<{ matches: import("./types").JobMatch[]; company_name: string; total: number }> {
+  return apiFetch(`/api/companies/${slug}/match`, {
+    method: "POST",
+    body: JSON.stringify({ analysis_id: analysisId }),
+    next: { revalidate: 0 },
+  } as RequestInit);
+}
+
 export function getPrep(jobId: number, type: ContentType): Promise<PrepPlan> {
   return apiFetch<PrepPlan>(`/api/jobs/${jobId}/prep/${type}`);
 }
