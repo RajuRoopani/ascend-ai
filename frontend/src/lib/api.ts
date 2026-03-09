@@ -1,13 +1,19 @@
 import type { PaginatedJobs, JobDetail, CompaniesResponse, CompanyDetail, PrepPlan, ContentType } from "./types";
 
-// Always use relative paths — Next.js rewrites proxy /api/* to the backend.
-// This works identically locally and via devtunnel.
-const API_BASE = "";
+// Server components run in Node.js — relative URLs don't work there.
+// Browser calls go to /api/* which Next.js rewrites to the backend.
+// Server calls go directly to the backend container.
+const isServer = typeof window === "undefined";
+const API_BASE = isServer
+  ? (process.env.BACKEND_URL || "http://localhost:8001")
+  : "";
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const url = `${API_BASE}${path}`;
+  const res = await fetch(url, {
     ...options,
     headers: { "Content-Type": "application/json", ...options?.headers },
+    next: { revalidate: 300 },
   });
   if (!res.ok) {
     const error = await res.text().catch(() => res.statusText);

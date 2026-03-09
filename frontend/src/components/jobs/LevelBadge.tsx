@@ -1,10 +1,11 @@
-import { LEVEL_COLORS } from "@/lib/utils";
+import { LEVEL_CONFIG } from "@/lib/utils";
 
 export function LevelBadge({ level }: { level: string }) {
-  const cls = LEVEL_COLORS[level] || "bg-slate-100 text-slate-700";
+  const cfg = LEVEL_CONFIG[level] ?? { label: level, bg: "bg-slate-50", text: "text-slate-600", dot: "bg-slate-400" };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${cls}`}>
-      {level}
+    <span className={`badge ${cfg.bg} ${cfg.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+      {cfg.label}
     </span>
   );
 }

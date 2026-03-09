@@ -7,63 +7,79 @@ import { timeAgo } from "@/lib/utils";
 
 export function JobCard({ job }: { job: Job }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-md transition-all group">
-      <div className="flex items-start gap-3 mb-3">
-        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+    <div className="card p-5 flex flex-col gap-4 hover:shadow-md hover:border-indigo-100 hover:-translate-y-0.5 transition-all duration-200 group">
+      {/* Header */}
+      <div className="flex items-start gap-3">
+        <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
           {job.company_logo_url ? (
             <Image
               src={job.company_logo_url}
               alt={job.company_name}
-              width={40}
-              height={40}
-              className="object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              width={44}
+              height={44}
+              className="object-contain p-1"
             />
           ) : (
-            <span className="text-lg font-bold text-slate-400">
-              {job.company_name[0]}
-            </span>
+            <span className="text-base font-bold text-slate-300">{job.company_name[0]}</span>
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-slate-500 mb-0.5">{job.company_name}</p>
-          <h3 className="font-semibold text-slate-900 text-sm leading-tight truncate group-hover:text-indigo-700 transition-colors">
+          <p className="text-xs font-medium text-slate-400 mb-0.5">{job.company_name}</p>
+          <h3 className="font-semibold text-slate-900 text-sm leading-snug line-clamp-2 group-hover:text-indigo-700 transition-colors">
             {job.title}
           </h3>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+      {/* Badges */}
+      <div className="flex flex-wrap gap-1.5">
         <LevelBadge level={job.level} />
         <RemotePill remote={job.remote} />
         {job.company_tier === "faang_plus" && (
-          <span className="px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">FAANG+</span>
+          <span className="badge bg-amber-50 text-amber-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> FAANG+
+          </span>
         )}
         {job.company_tier === "ai_startup" && (
-          <span className="px-2 py-0.5 rounded text-xs font-medium bg-violet-100 text-violet-700">AI Startup</span>
+          <span className="badge bg-violet-50 text-violet-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-400" /> AI Startup
+          </span>
         )}
       </div>
 
-      <p className="text-xs text-slate-500 mb-4 flex items-center gap-1">
-        <span>📍</span>
-        <span className="truncate">{job.location || "Remote"}</span>
-        <span className="ml-auto flex-shrink-0">{timeAgo(job.fetched_at)}</span>
-      </p>
+      {/* Location + time */}
+      <div className="flex items-center justify-between text-xs text-slate-400">
+        <span className="flex items-center gap-1 truncate">
+          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span className="truncate">{job.location || "Remote"}</span>
+        </span>
+        <span className="flex-shrink-0 ml-2">{timeAgo(job.fetched_at)}</span>
+      </div>
 
-      <div className="flex gap-2">
+      {/* Actions */}
+      <div className="flex gap-2 pt-1 border-t border-slate-50">
         <Link
           href={`/jobs/${job.id}`}
-          className="flex-1 text-center py-2 px-3 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-colors"
+          className="flex-1 btn-primary text-xs py-2"
         >
-          Get Prep Plan ✨
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          Get Prep Plan
         </Link>
         <a
           href={job.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="py-2 px-3 rounded-lg border border-slate-200 text-slate-600 text-xs font-medium hover:bg-slate-50 transition-colors"
+          className="btn-ghost text-xs py-2 px-3"
         >
-          Apply →
+          Apply
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
         </a>
       </div>
     </div>
