@@ -60,7 +60,7 @@ export default function ResearchPage() {
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[11px] font-semibold text-[var(--text-2)] mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-light)]" />
-            Any company — not just our 31 tracked
+            Any company — not just our 43 tracked
           </div>
           <h1 className="text-4xl font-extrabold text-[var(--text-1)] tracking-tight mb-3">
             Company Interview Research

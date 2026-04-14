@@ -118,22 +118,27 @@ async def _ensure_table() -> None:
 async def get_or_generate_research(company_name: str, role_hint: str = "") -> dict:
     await _ensure_table()
 
-    key = _normalize(company_name)
+    # company_key is always clean (no role) — used by frontend for chat and job lookup
+    company_key = _normalize(company_name)
+    # cache_key includes role so different roles get independent cached research
+    role_slug = _normalize(role_hint) if role_hint.strip() else ""
+    cache_key = f"{company_key}__{role_slug}" if role_slug else company_key
 
     async with get_db() as conn:
         cached = await conn.fetchrow(
-            "SELECT * FROM company_research WHERE company_key = $1", key
+            "SELECT * FROM company_research WHERE company_key = $1", cache_key
         )
         if cached:
-            logger.info("Cache hit for company research: %s", company_name)
-            return {**dict(cached), "cached": True}
+            logger.info("Cache hit for company research: %s (role: %s)", company_name, role_hint or "any")
+            row = {**dict(cached), "company_key": company_key, "cached": True}
+            return row
 
     system_prompt, user_prompt = _build_prompt(company_name, role_hint)
 
     settings = get_settings()
     client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
 
-    logger.info("Generating company research for: %s", company_name)
+    logger.info("Generating company research for: %s (role: %s)", company_name, role_hint or "any")
     message = await client.messages.create(
         model=_MODEL,
         max_tokens=_MAX_TOKENS,
@@ -155,7 +160,7 @@ async def get_or_generate_research(company_name: str, role_hint: str = "") -> di
                 generated_at = NOW()
             RETURNING *
             """,
-            key, company_name, content, _MODEL,
+            cache_key, company_name, content, _MODEL,
         )
 
-    return {**dict(row), "cached": False}
+    return {**dict(row), "company_key": company_key, "cached": False}
