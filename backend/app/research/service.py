@@ -149,18 +149,20 @@ async def get_or_generate_research(company_name: str, role_hint: str = "") -> di
     content = message.content[0].text
     logger.info("Generated research for %s (%d tokens)", company_name, message.usage.output_tokens)
 
+    upsert_sql = """
+        INSERT INTO company_research (company_key, company_name, content, model)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (company_key) DO UPDATE SET
+            content = EXCLUDED.content,
+            model = EXCLUDED.model,
+            generated_at = NOW()
+        RETURNING *
+    """
     async with get_db() as conn:
-        row = await conn.fetchrow(
-            """
-            INSERT INTO company_research (company_key, company_name, content, model)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT (company_key) DO UPDATE SET
-                content = EXCLUDED.content,
-                model = EXCLUDED.model,
-                generated_at = NOW()
-            RETURNING *
-            """,
-            cache_key, company_name, content, _MODEL,
-        )
+        row = await conn.fetchrow(upsert_sql, cache_key, company_name, content, _MODEL)
+        # Always keep clean company_key in sync so chat lookups (which use company_key)
+        # find the research regardless of the role_hint used when it was generated.
+        if cache_key != company_key:
+            await conn.execute(upsert_sql, company_key, company_name, content, _MODEL)
 
     return {**dict(row), "company_key": company_key, "cached": False}
